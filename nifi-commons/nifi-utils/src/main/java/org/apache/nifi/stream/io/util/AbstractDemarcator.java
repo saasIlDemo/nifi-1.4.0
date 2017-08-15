@@ -25,6 +25,9 @@ import org.apache.nifi.stream.io.exception.TokenTooLargeException;
 
 /**
  * Base class for implementing streaming demarcators.
+ * 可关闭的数据抽象类
+ * 初始化大小为8192
+ * 初始方法是传一个初始化大小和输入流以及一个最大大小
  * <p>
  * NOTE: Not intended for multi-thread usage hence not Thread-safe.
  * </p>
@@ -32,17 +35,18 @@ import org.apache.nifi.stream.io.exception.TokenTooLargeException;
 abstract class AbstractDemarcator implements Closeable {
 
     final static int INIT_BUFFER_SIZE = 8192;
-
+    //输入流
     private final InputStream is;
 
     /*
-     * The size of the initial buffer. Its value is also used when bufer needs
+     * The size of the initial buffer. Its value is also used when buffer needs
      * to be expanded.
+     *
      */
     private final int initialBufferSize;
 
     /*
-     * The maximum allowed size of the token. In the event such size is exceeded
+     * The maximum allowed size of the token(数据). In the event such size is exceeded
      * TokenTooLargeException is thrown.
      */
     private final int maxDataSize;
@@ -119,19 +123,19 @@ abstract class AbstractDemarcator implements Closeable {
      */
     void fill() throws IOException {
         if (this.index >= this.buffer.length) {
-            if (this.mark == 0) { // expand
-                long expandedSize = this.buffer.length + this.initialBufferSize;
+            if (this.mark == 0) { // expand（当不存在空数时使用简单的数组扩容与复制）
+                long expandedSize = this.buffer.length + this.initialBufferSize;//每次扩容都是使其长度增加一个初始值
                 if (expandedSize > Integer.MAX_VALUE) {
                     throw new BufferOverflowException(); // will probably OOM before this will ever happen, but just in case.
                 }
                 byte[] newBuff = new byte[(int) expandedSize];
                 System.arraycopy(this.buffer, 0, newBuff, 0, this.buffer.length);
                 this.buffer = newBuff;
-            } else { // shuffle
-                int length = this.index - this.mark;
+            } else { // shuffle 数组清理
+                int length = this.index - this.mark;//真实长度
                 System.arraycopy(this.buffer, this.mark, this.buffer, 0, length);
-                this.index = length;
-                this.mark = 0;
+                this.index = length;//归位
+                this.mark = 0;//归位
             }
         }
 

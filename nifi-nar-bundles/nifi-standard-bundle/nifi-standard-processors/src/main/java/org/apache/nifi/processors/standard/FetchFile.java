@@ -241,7 +241,7 @@ public class FetchFile extends AbstractProcessor {
 
         // import content from file system
         try (final FileInputStream fis = new FileInputStream(file)) {
-            flowFile = session.importFrom(fis, flowFile);
+            flowFile = session.importFrom(fis, flowFile); //修改了flowfile ，Writes to the given FlowFile all content from the given content path.
         } catch (final IOException ioe) {
             getLogger().error("Could not fetch file {} from file system for {} due to {}; routing to failure", new Object[] {file, flowFile, ioe.toString()}, ioe);
             session.transfer(session.penalize(flowFile), REL_FAILURE);

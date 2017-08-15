@@ -32,12 +32,14 @@ import org.junit.Test;
 
 public class TestRepairCorruptedFileEndings {
     private final File targetFile = new File("target/1.bin");
-
+    {
+        targetFile.delete();
+    }
     @Before
     @After
     public void cleanup() {
         if (targetFile.exists()) {
-            Assert.assertTrue(targetFile.delete());
+            targetFile.delete();
         }
     }
 

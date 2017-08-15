@@ -172,9 +172,9 @@ public class GenerateTableFetch extends AbstractDatabaseFetchProcessor {
                 return;
             }
         }
-
+        //如果有输入
         final ComponentLog logger = getLogger();
-
+        //初始化属性
         final DBCPService dbcpService = context.getProperty(DBCP_SERVICE).asControllerService(DBCPService.class);
         final DatabaseAdapter dbAdapter = dbAdapters.get(context.getProperty(DB_TYPE).getValue());
         final String tableName = context.getProperty(TABLE_NAME).evaluateAttributeExpressions(fileToProcess).getValue();
@@ -262,7 +262,7 @@ public class GenerateTableFetch extends AbstractDatabaseFetchProcessor {
                     // Update the state map with the newly-observed maximum values
                     ResultSetMetaData rsmd = resultSet.getMetaData();
                     for (int i = 2; i <= rsmd.getColumnCount(); i++) {
-                        //Some JDBC drivers consider the columns name and label to be very different things.
+                        // Some JDBC drivers consider the columns name and label to be very different things.
                         // Since this column has been aliased lets check the label first,
                         // if there is no label we'll use the column name.
                         String resultColumnName = (StringUtils.isNotEmpty(rsmd.getColumnLabel(i))?rsmd.getColumnLabel(i):rsmd.getColumnName(i)).toLowerCase();

@@ -392,7 +392,7 @@ public class PutHiveStreaming extends AbstractSessionFactoryProcessor {
 
         /**
          * It's possible that multiple Hive streaming transactions are committed within a single onTrigger.
-         * PutHiveStreaming onTrigger is not 'transactional' in a sense of RollbackOnFailure.
+         * PutHiveStreaming onTrigger is not 'transactional事务' in a sense of RollbackOnFailure.
          * Once a Hive streaming transaction is committed, processor session will not be rolled back.
          * @param rollbackOnFailure whether process session should be rolled back if failed
          */

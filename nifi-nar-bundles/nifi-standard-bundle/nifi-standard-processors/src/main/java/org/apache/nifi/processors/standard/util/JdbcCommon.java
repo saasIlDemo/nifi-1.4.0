@@ -78,7 +78,7 @@ import org.apache.nifi.processor.util.StandardValidators;
 /**
  * JDBC / SQL common functions.
  */
-public class JdbcCommon {
+public class  JdbcCommon {
 
     private static final int MAX_DIGITS_IN_BIGINT = 19;
     private static final int MAX_DIGITS_IN_INT = 9;
@@ -239,20 +239,24 @@ public class JdbcCommon {
 
     public static long convertToAvroStream(final ResultSet rs, final OutputStream outStream, final AvroConversionOptions options, final ResultSetRowCallback callback)
             throws SQLException, IOException {
-        final Schema schema = createSchema(rs, options);
+        final Schema schema = createSchema(rs, options); //* Creates an Avro schema from a result set.
         final GenericRecord rec = new GenericData.Record(schema);
 
         final DatumWriter<GenericRecord> datumWriter = new GenericDatumWriter<>(schema);
         try (final DataFileWriter<GenericRecord> dataFileWriter = new DataFileWriter<>(datumWriter)) {
+            //binding the out put and data
             dataFileWriter.create(schema, outStream);
-
             final ResultSetMetaData meta = rs.getMetaData();
             final int nrOfColumns = meta.getColumnCount();
             long nrOfRows = 0;
+            //process every row to avro
             while (rs.next()) {
                 if (callback != null) {
-                    callback.processRow(rs);
+                    //若callback不是null的，则这部分能够使callback内的函数执行
+                    callback.processRow(rs); //An interface for callback methods which allows processing of a row during the convertToAvroStream() processing.
                 }
+
+                //fot every column in this table
                 for (int i = 1; i <= nrOfColumns; i++) {
                     final int javaSqlType = meta.getColumnType(i);
                     final Schema fieldSchema = schema.getFields().get(i - 1).schema();
@@ -380,13 +384,16 @@ public class JdbcCommon {
                         rec.put(i - 1, value.toString());
                     }
                 }
+//                just wanna see what happend
+//                System.out.println(rec.toString());
+
                 dataFileWriter.append(rec);
                 nrOfRows += 1;
 
                 if (options.maxRows > 0 && nrOfRows == options.maxRows)
                     break;
             }
-
+//            System.out.println(nrOfRows);
             return nrOfRows;
         }
     }

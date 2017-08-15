@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.nifi.processors.standard;
+package org.apache.nifi.processors.sha0w;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.nifi.annotation.behavior.DynamicProperty;
@@ -44,6 +44,9 @@ import org.apache.nifi.processor.Relationship;
 import org.apache.nifi.processor.exception.ProcessException;
 import org.apache.nifi.processor.io.OutputStreamCallback;
 import org.apache.nifi.processor.util.StandardValidators;
+import org.apache.nifi.processors.standard.AbstractDatabaseFetchProcessor;
+import org.apache.nifi.processors.standard.ExecuteSQL;
+import org.apache.nifi.processors.standard.GenerateTableFetch;
 import org.apache.nifi.processors.standard.db.DatabaseAdapter;
 import org.apache.nifi.processors.standard.util.JdbcCommon;
 import org.apache.nifi.util.StopWatch;
@@ -113,10 +116,11 @@ public class QueryDatabaseTable extends AbstractDatabaseFetchProcessor {
     public static final String RESULT_TABLENAME = "tablename";
     public static final String RESULT_ROW_COUNT = "querydbtable.row.count";
     public static final String INTIIAL_MAX_VALUE_PROP_START = "initial.maxvalue.";
-
+    public static AtomicLong processNum = new AtomicLong(0);
 
     public static final PropertyDescriptor FETCH_SIZE = new PropertyDescriptor.Builder()
             .name("Fetch Size")
+            //为 JDBC 驱动程序提供一个提示，它提示此 Statement 生成的 ResultSet 对象需要更多行时应该从数据库获取的行数。
             .description("The number of result rows to be fetched from the result set at a time. This is a hint to the driver and may not be "
                     + "honored and/or exact. If the value specified is zero, then the hint is ignored.")
             .defaultValue("0")
@@ -332,11 +336,13 @@ public class QueryDatabaseTable extends AbstractDatabaseFetchProcessor {
                         // If there were no rows returned, don't send the flowfile
                         session.remove(fileToProcess);
                         context.yield();
+
                         break;
                     }
                         // if there were too many rows to return
                     fragmentIndex++;
                     if (maxFragments > 0 && fragmentIndex >= maxFragments) {
+                        processNum.addAndGet(nrOfRows.get());
                         break;
                     }
                 }
@@ -461,7 +467,7 @@ public class QueryDatabaseTable extends AbstractDatabaseFetchProcessor {
                 // Iterate over the row, check-and-set max values
                 final ResultSetMetaData meta = resultSet.getMetaData();
                 final int nrOfColumns = meta.getColumnCount();
-                if (nrOfColumns > 0) {
+                if (nrOfColumns > 0) {//valid
                     for (int i = 1; i <= nrOfColumns; i++) {
                         String colName = meta.getColumnName(i).toLowerCase();
                         String fullyQualifiedMaxValueKey = getStateKey(tableName, colName);
