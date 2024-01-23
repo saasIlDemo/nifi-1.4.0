@@ -4,9 +4,10 @@
     "configExternalURL": "",
     "projectToken": "",
     "baseBranches": []
+    "enableReachability": true
   },
   "scanSettingsSAST": {
-    "enableScan": false,
+    "enableScan": true,
     "scanPullRequests": false,
     "incrementalScan": true,
     "baseBranches": [],
