@@ -21,7 +21,7 @@ language governing permissions and limitations under the License. -->
     <packaging>jar</packaging>
 
     <properties>
-        <jna.version>4.2.2</jna.version>
+        <jna.version>5.0.0</jna.version>
         <javassist.version>3.20.0-GA</javassist.version>
     </properties>
 
