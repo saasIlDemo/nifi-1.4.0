@@ -95,7 +95,7 @@
         <org.slf4j.version>1.7.25</org.slf4j.version>
         <jetty.version>9.4.3.v20170317</jetty.version>
         <lucene.version>4.10.4</lucene.version>
-        <spring.version>4.2.4.RELEASE</spring.version>
+        <spring.version>5.2.18.RELEASE</spring.version>
         <spring.security.version>4.0.3.RELEASE</spring.security.version>
         <jersey.version>1.19</jersey.version>
         <hadoop.version>2.7.3</hadoop.version>
